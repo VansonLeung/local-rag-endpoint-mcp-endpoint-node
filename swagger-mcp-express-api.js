@@ -1,5 +1,5 @@
 import express from 'express';
-import { StreamableHTTPServerTransport } from '@socotra/modelcontextprotocol-sdk/server/streamableHttp.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import cors from 'cors';
 import { createMcpServer } from './swagger-mcp.js';
 

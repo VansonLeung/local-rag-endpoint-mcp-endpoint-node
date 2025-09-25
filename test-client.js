@@ -1,5 +1,5 @@
-import { Client } from '@socotra/modelcontextprotocol-sdk/client/index.js';
-import { StreamableHTTPClientTransport } from '@socotra/modelcontextprotocol-sdk/client/streamableHttp.js';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -7,7 +7,7 @@ dotenv.config();
 
 async function testMCPClient() {
   // Create MCP client
-  const client = new Client({
+  const client = new Client({ 
     name: 'test-client',
     version: '1.0.0',
   });

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { McpServer } from '@socotra/modelcontextprotocol-sdk/server/mcp.js';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { buildInputSchema } from './swagger-utils.js';
 
 const paramMapping = {};
@@ -106,9 +106,17 @@ export function createMcpServer(swaggerSpec, apiBaseUrl) {
             headerParams,
           } = buildInputSchema(operation, swaggerSpec);
 
-          paramMapping[toolName] = paramMapping[toolName] || {
+          // convert path slash to _
+          // convert space to -
+          const mcpToolName = toolName
+          .replace(/\//g, '_').replace(/{/g, '').replace(/}/g, '')
+          .replace(/ /g, '-');
+
+          paramMapping[mcpToolName] = paramMapping[mcpToolName] || {
             method,
             fullPath,
+            toolName,
+            mcpToolName,
             inputSchema,
             queryParams,
             pathParams,
@@ -117,11 +125,11 @@ export function createMcpServer(swaggerSpec, apiBaseUrl) {
             headerParams,
           };
 
-          console.log(`🔧 Registering tool: ${toolName} ... ${JSON.stringify(operation)}`);
+          console.log(`🔧 Registering tool: ${mcpToolName} ... ${JSON.stringify(operation)}`);
           console.log(`  - Description: ${description}`);
           console.log(`  - Input Schema:`, JSON.stringify(inputSchema, null, 2));
-          server.tool(toolName, description, inputSchema, async (args) => {
-            console.log(`⚡ Calling tool: ${toolName} with args:`, args);
+          server.tool(mcpToolName, description, inputSchema, async (args) => {
+            console.log(`⚡ Calling tool: ${mcpToolName} with args:`, args);
             return await callApi(method, fullPath, args, apiBaseUrl);
           });
           toolCount++;
