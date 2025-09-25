@@ -1,0 +1,22 @@
+{
+  "name": "local-rag-endpoint-mcp-endpoint-node",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test-direct.js",
+    "dev": "node test-client.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@socotra/modelcontextprotocol-sdk": "^1.18.0",
+    "axios": "^1.12.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "zod": "^4.1.11"
+  }
+}

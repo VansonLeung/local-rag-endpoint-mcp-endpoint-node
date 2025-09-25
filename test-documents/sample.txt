@@ -1,0 +1,7 @@
+This is a test document for MCP file upload functionality.
+
+It contains multiple lines of text to test the upload feature.
+
+The MCP server should be able to handle file uploads through the POST /api/upload endpoint.
+
+End of test document.

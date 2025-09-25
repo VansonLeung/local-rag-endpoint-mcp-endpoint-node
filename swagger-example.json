@@ -1,0 +1,510 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Local RAG Endpoint API",
+        "description": "A Node.js RAG endpoint with SQLite and vector embeddings for document upload, search, and retrieval",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Local RAG Endpoint Support"
+        }
+    },
+    "host": "localhost:13301",
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "definitions": {
+        "HealthResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "OK"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Local RAG Endpoint is running"
+                }
+            }
+        },
+        "UploadResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "File uploaded and processed successfully"
+                },
+                "documentId": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "preview": {
+                    "type": "string",
+                    "example": "Document content preview text..."
+                }
+            }
+        },
+        "SearchRequest": {
+            "type": "object",
+            "required": [
+                "query"
+            ],
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Search query in natural language",
+                    "example": "machine learning fundamentals"
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Number of results to return",
+                    "default": 10,
+                    "example": 10
+                },
+                "page": {
+                    "type": "integer",
+                    "description": "Page number for pagination",
+                    "default": 1,
+                    "example": 1
+                }
+            }
+        },
+        "SearchResult": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "document.pdf"
+                },
+                "content": {
+                    "type": "string",
+                    "example": "Relevant content snippet..."
+                },
+                "similarity": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.95
+                },
+                "uploadDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-15T10:30:00.000Z"
+                }
+            }
+        },
+        "SearchResponse": {
+            "type": "object",
+            "properties": {
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SearchResult"
+                    }
+                },
+                "page": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "limit": {
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
+        "Document": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "document.pdf"
+                },
+                "preview": {
+                    "type": "string",
+                    "example": "Content preview text..."
+                },
+                "uploadDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2024-01-15T10:30:00.000Z"
+                }
+            }
+        },
+        "DocumentsResponse": {
+            "type": "object",
+            "properties": {
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Document"
+                    }
+                },
+                "page": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "limit": {
+                    "type": "integer",
+                    "example": 50
+                }
+            }
+        },
+        "ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Error message description"
+                }
+            }
+        },
+        "UploadFileResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "File uploaded successfully"
+                },
+                "fileUrl": {
+                    "type": "string",
+                    "example": "/uploads/document.pdf"
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "document.pdf"
+                }
+            }
+        },
+        "ProcessDocumentRequest": {
+            "type": "object",
+            "required": [
+                "filename"
+            ],
+            "properties": {
+                "filename": {
+                    "type": "string",
+                    "description": "Name of the file in uploads folder to process",
+                    "example": "1758765824314-document.pdf"
+                }
+            }
+        },
+        "ProcessDocumentResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Document processed and indexed successfully"
+                },
+                "documentId": {
+                    "type": "integer",
+                    "example": 123
+                },
+                "preview": {
+                    "type": "string",
+                    "example": "Document content preview text..."
+                }
+            }
+        },
+        "DownloadFileRequest": {
+            "type": "object",
+            "required": [
+                "fileUrl"
+            ],
+            "properties": {
+                "fileUrl": {
+                    "type": "string",
+                    "description": "URL of the file to download",
+                    "example": "https://pdfobject.com/pdf/sample.pdf"
+                }
+            }
+        },
+        "DownloadFileResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "File downloaded and saved successfully"
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "1758765824314-document.pdf"
+                },
+                "fileUrl": {
+                    "type": "string",
+                    "example": "/uploads/1758765824314-document.pdf"
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/": {
+            "get": {
+                "summary": "API Root",
+                "description": "Returns a welcome message for the API",
+                "tags": [
+                    "General"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Welcome message",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "API endpoints will be added here"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/upload": {
+            "post": {
+                "summary": "Upload Document File",
+                "description": "Upload a document file and get a file URL for later processing. Supported formats - .txt, .pdf, .docx, .xlsx, .csv",
+                "tags": [
+                    "Documents"
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "file",
+                        "type": "file",
+                        "description": "The document file to upload",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File uploaded successfully",
+                        "schema": {
+                            "$ref": "#/definitions/UploadFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - no file uploaded or invalid file type",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/download": {
+            "post": {
+                "summary": "Download File from URL",
+                "description": "Download a file from a given URL and save it to the uploads folder",
+                "tags": [
+                    "Documents"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "downloadRequest",
+                        "description": "Download file request",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DownloadFileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File downloaded and saved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/DownloadFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - fileUrl is required",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/process": {
+            "post": {
+                "summary": "Process Document",
+                "description": "Process a document file from the uploads folder and add it to the search index",
+                "tags": [
+                    "Documents"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "processRequest",
+                        "description": "Process document request",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProcessDocumentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document processed and indexed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/ProcessDocumentResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - filename is required",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "File not found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/search": {
+            "post": {
+                "summary": "Search Documents",
+                "description": "Perform semantic search across all uploaded documents using natural language queries",
+                "tags": [
+                    "Search"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "searchRequest",
+                        "description": "Search parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/SearchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search results returned successfully",
+                        "schema": {
+                            "$ref": "#/definitions/SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - query is required",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documents": {
+            "get": {
+                "summary": "List Documents",
+                "description": "Retrieve a paginated list of all uploaded documents",
+                "tags": [
+                    "Documents"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "default": 50,
+                        "maximum": 100,
+                        "description": "Number of documents per page"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "default": 1,
+                        "minimum": 1,
+                        "description": "Page number for pagination"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Documents list returned successfully",
+                        "schema": {
+                            "$ref": "#/definitions/DocumentsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "summary": "Health Check",
+                "description": "Check if the service is running and operational",
+                "tags": [
+                    "Health"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service is healthy",
+                        "schema": {
+                            "$ref": "#/definitions/HealthResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "responses": {},
+    "parameters": {},
+    "securityDefinitions": {},
+    "tags": []
+}
